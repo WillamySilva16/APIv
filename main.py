@@ -1,34 +1,34 @@
-from fastapi import FastAPI
-import pymssql
 import os
+import pyodbc
+import pandas as pd
+from fastapi import FastAPI
+from dotenv import load_dotenv
 
+load_dotenv()
 app = FastAPI()
 
-# Função de conexão ao SQL Server
-def connect_db():
-    return pymssql.connect(
-        server=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS"),
-        database=os.getenv("DB_NAME")
+def get_connection():
+    server = os.getenv("DB_HOST")
+    database = os.getenv("DB_NAME")
+    username = os.getenv("DB_USER")
+    password = os.getenv("DB_PASS")
+
+    conn_str = (
+        "DRIVER={ODBC Driver 17 for SQL Server};"
+        f"SERVER={server};"
+        f"DATABASE={database};"
+        f"UID={username};"
+        f"PWD={password}"
     )
+    return pyodbc.connect(conn_str)
 
 @app.get("/")
-def home():
-    return {"status": "API ONLINE — SQL SERVER → JSON"}
+def root():
+    return {"status": "API ONLINE"}
 
-@app.get("/data")
-def get_data():
-    conn = connect_db()
-    cursor = conn.cursor(as_dict=True)
-
-    # 🔥 AJUSTE AQUI: NOME DA SUA TABELA
-    query = "SELECT TOP 50 * FROM TAB_REGISTRO_VISITA_SUPERVISAO_CABECALHO"  
-    cursor.execute(query)
-
-    rows = cursor.fetchall()
-
-    cursor.close()
+@app.get("/visitas")
+def visitas():
+    conn = get_connection()
+    df = pd.read_sql_query("SELECT TOP 100 * FROM TAB_REGISTRO_VISITA_SUPERVISAO_CABECALHO", conn)
     conn.close()
-
-    return rows
+    return df.to_dict(orient="records")

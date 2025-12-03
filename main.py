@@ -1,34 +1,31 @@
-import os
-import pyodbc
-import pandas as pd
 from fastapi import FastAPI
-from dotenv import load_dotenv
+import pymssql
+import os
 
-load_dotenv()
 app = FastAPI()
 
-def get_connection():
-    server = os.getenv("DB_HOST")
-    database = os.getenv("DB_NAME")
-    username = os.getenv("DB_USER")
-    password = os.getenv("DB_PASS")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
 
-    conn_str = (
-        "DRIVER={ODBC Driver 17 for SQL Server};"
-        f"SERVER={server};"
-        f"DATABASE={database};"
-        f"UID={username};"
-        f"PWD={password}"
+def conectar():
+    return pymssql.connect(
+        server=DB_HOST,
+        user=DB_USER,
+        password=DB_PASS,
+        database=DB_NAME
     )
-    return pyodbc.connect(conn_str)
 
 @app.get("/")
-def root():
-    return {"status": "API ONLINE"}
+def home():
+    return {"status": "API funcionando"}
 
 @app.get("/visitas")
 def visitas():
-    conn = get_connection()
-    df = pd.read_sql_query("SELECT TOP 100 * FROM TAB_REGISTRO_VISITA_SUPERVISAO_CABECALHO", conn)
+    conn = conectar()
+    cursor = conn.cursor(as_dict=True)
+    cursor.execute("SELECT TOP 100 * FROM TAB_REGISTRO_VISITA_SUPERVISAO_CABECALHO")
+    dados = cursor.fetchall()
     conn.close()
-    return df.to_dict(orient="records")
+    return dados

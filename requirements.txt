@@ -1,5 +1,7 @@
 fastapi
 uvicorn
-pymssql
+pytds
+sqlalchemy
 requests
 python-dotenv
+pandas

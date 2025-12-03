@@ -12,7 +12,7 @@ def get_sql_conn():
     server = "pbdb3073.database.windows.net"
     database = "PBDB3073"
     username = "admrs"
-    password = os.getenv("DB_PASSWORD")
+    password = os.getenv("Gf3$Rn8!Qb12^KsW0tZ")
 
     return pymssql.connect(
         server=server,

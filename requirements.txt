@@ -1,3 +1,5 @@
-flask
-pandas
+fastapi
+uvicorn
 pymssql
+requests
+python-dotenv

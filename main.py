@@ -1,6 +1,6 @@
 import pandas as pd
-import pyodbc
 from flask import Flask, jsonify
+import pymssql
 import os
 
 app = Flask(__name__)
@@ -12,19 +12,15 @@ def get_sql_conn():
     server = "pbdb3073.database.windows.net"
     database = "PBDB3073"
     username = "admrs"
-    password = os.getenv("Gf3$Rn8!Qb12^KsW0tZ")  # senha fica no Railway
+    password = os.getenv("DB_PASSWORD")
 
-    connection_string = (
-        "DRIVER={ODBC Driver 18 for SQL Server};"
-        f"SERVER={server};"
-        f"DATABASE={database};"
-        f"UID={username};"
-        f"PWD={password};"
-        "Encrypt=yes;"
-        "TrustServerCertificate=no;"
+    return pymssql.connect(
+        server=server,
+        user=username,
+        password=password,
+        database=database,
+        port=1433
     )
-
-    return pyodbc.connect(connection_string)
 
 # ----------------------------
 # 2. Consulta SQL
@@ -37,7 +33,7 @@ def load_data():
     return df
 
 # ----------------------------
-# 3. Endpoint para o Looker
+# 3. Endpoint /data
 # ----------------------------
 @app.route("/data", methods=["GET"])
 def data():
@@ -46,7 +42,7 @@ def data():
 
 @app.route("/", methods=["GET"])
 def home():
-    return "API ONLINE - SQL SERVER → JSON → LOOKER STUDIO"
+    return "API ONLINE - SQL SERVER → JSON → LOOKER"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

@@ -12,7 +12,7 @@ def get_sql_conn():
     server = "pbdb3073.database.windows.net"
     database = "PBDB3073"
     username = "admrs"
-    password = os.getenv("DB_PASSWORD")  # senha fica no Railway
+    password = os.getenv("Gf3$Rn8!Qb12^KsW0tZ")  # senha fica no Railway
 
     connection_string = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
